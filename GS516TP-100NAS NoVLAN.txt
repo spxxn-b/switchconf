@@ -1,0 +1,481 @@
+0x4E470x010x00gs7xxtp_p           6.0.1.16            0x000000000x00000000000000
+config-file-header
+
+v6.0.1.16 / RNG60_760_045
+CLI v1.0
+set system mode router 
+           qos active 
+           policy-based-vlans inactive 
+
+@
+lacp system-priority 32768
+vlan database
+vlan 2-3 
+exit
+voice vlan oui-table add 0001e3 SIEMENS
+voice vlan oui-table add 00036b CISCO1
+voice vlan oui-table add 00040d AVAYA1
+voice vlan oui-table add 000fe2 H3C
+voice vlan oui-table add 001243 CISCO2
+voice vlan oui-table add 001b4f AVAYA2
+voice vlan oui-table add 0060b9 NITSUKO
+voice vlan oui-table add 00d01e PINTEL
+voice vlan oui-table add 00e075 VERILINK
+voice vlan oui-table add 00e0bb 3COM
+qos advanced ports-trusted 
+qos advanced-mode trust cos 
+ip access-list extended "fDAL SIP&RTP"
+permit ip any 69.71.29.0 0.0.0.255
+exit
+ip access-list extended "fDAL UC1"
+permit ip any 69.71.28.0 0.0.0.255
+exit
+ip access-list extended "fCHI SIP&RTP"
+permit ip any 207.148.223.199 0.0.0.15
+exit
+ip access-list extended "fCHI SIP&RTP-2"
+permit ip any 207.148.223.130 0.0.0.0
+exit
+ip access-list extended "fCHI UC1"
+permit ip any 207.148.223.32 0.0.0.63
+exit
+ip access-list extended "fCHI UC1-2"
+permit ip any 207.148.223.96 0.0.0.7
+exit
+ip access-list extended "fCC 1"
+permit ip any 207.148.223.51 0.0.0.0
+exit
+ip access-list extended "fCC 2"
+permit ip any 207.148.223.214 0.0.0.0
+exit
+ip access-list extended "fCC 3"
+permit ip any 207.148.223.215 0.0.0.0
+exit
+ip access-list extended "fCC 4"
+permit ip any 69.71.28.50 0.0.0.0
+exit
+ip access-list extended "fInbound Class Chicago"
+permit ip 207.148.223.0 0.0.0.255 any
+exit
+ip access-list extended "fInbound Class Dallas"
+permit ip 69.71.28.0 0.0.0.255 any
+exit
+ip access-list extended "fInbound Class Dallas 2"
+permit ip 69.71.29.0 0.0.0.255 any
+exit
+ip access-list extended "fRTP INT"
+permit udp 10.0.0.0 0.0.0.255 any 10.0.0.0 0.0.0.255 any
+exit
+priority-queue out num-of-queues 0
+class-map "cDAL SIP&RTP"
+match access-group "fDAL SIP&RTP"
+exit
+class-map "cDAL UC1"
+match access-group "fDAL UC1"
+exit
+class-map "cCHI SIP&RTP"
+match access-group "fCHI SIP&RTP"
+exit
+class-map "cCHI SIP&RTP-2"
+match access-group "fCHI SIP&RTP-2"
+exit
+class-map "cCHI UC1"
+match access-group "fCHI UC1"
+exit
+class-map "cCHI UC1-2"
+match access-group "fCHI UC1-2"
+exit
+class-map "cCC 1"
+match access-group "fCC 1"
+exit
+class-map "cCC 2"
+match access-group "fCC 2"
+exit
+class-map "cCC 3"
+match access-group "fCC 3"
+exit
+class-map "cCC 4"
+match access-group "fCC 4"
+exit
+class-map "cInbound Class Chicago"
+match access-group "fInbound Class Chicago"
+exit
+class-map "cInbound Class Dallas"
+match access-group "fInbound Class Dallas"
+exit
+class-map "cInbound Class Dallas 2"
+match access-group "fInbound Class Dallas 2"
+exit
+class-map "cRTP INT"
+match access-group "fRTP INT"
+exit
+policy-map pBTI_Pri1_Inbound
+class "cInbound Class Chicago"
+set queue 4
+exit
+class "cInbound Class Dallas"
+set queue 4
+exit
+class "cInbound Class Dallas 2"
+set queue 4
+exit
+exit
+policy-map "pBTI Pri1 Outbound"
+class "cDAL SIP&RTP"
+set dscp 46
+exit
+class "cDAL UC1"
+set dscp 46
+exit
+class "cCHI SIP&RTP"
+set dscp 46
+exit
+class "cCHI SIP&RTP-2"
+set dscp 46
+exit
+class "cCHI UC1"
+set dscp 46
+exit
+class "cCHI UC1-2"
+set dscp 46
+exit
+class "cCC 1"
+set dscp 46
+exit
+class "cCC 2"
+set dscp 46
+exit
+class "cCC 3"
+set dscp 46
+exit
+class "cCC 4"
+set dscp 46
+exit
+class "cRTP INT"
+set dscp 46
+exit
+exit
+wrr-queue bandwidth 8 8 8 76 
+username admin password encrypted ae48304675c0541fe5920a71fd512d30f1528767 privilege 15 
+snmp-server engineID local 8000005903003333333333
+snmp-server community private rw view Default 
+snmp-server community public ro view Default 
+snmp-server group default v3 noauth notify Default read Default write Default 
+snmp-server group default v3 auth notify Default read Default write Default 
+snmp-server group default v3 priv notify Default read Default write Default 
+encrypted snmp-server user admin default v3 auth sha qDxDKPPHRjGm8IgQnMzRc/AH363/RYp4SMC2cp49OFQ= 
+clock timezone 13 -5
+clock source sntp
+sntp unicast client enable
+sntp unicast client poll
+sntp server 64.113.32.5 poll 
+sntp port 123
+service cpu-counters
+ip telnet server
+!
+interface vlan 1
+ ip address %IPADDRESS% %NETMASK% 
+ no ip address dhcp 
+ ipv6 address autoconfig 
+!
+interface vlan 2
+ name "Voice VLAN" 
+!
+interface vlan 3
+ name "Auto Video VLAN" 
+!
+interface gigabitethernet1
+ lacp timeout short 
+ lacp port-priority 128 
+ storm-control broadcast enable 
+ storm-control broadcast level kbps 10000 
+ storm-control include-multicast unknown-unicast 
+ service-policy input "p%QOS1%" default-action permit-any 
+ power inline priority critical 
+ auto-voip enable 
+!
+interface gigabitethernet2
+ lacp timeout short 
+ lacp port-priority 128 
+ storm-control broadcast enable 
+ storm-control broadcast level kbps 10000 
+ storm-control include-multicast unknown-unicast 
+ service-policy input "p%QOS2%" default-action permit-any 
+ power inline priority critical 
+ auto-voip enable 
+!
+interface gigabitethernet3
+ lacp timeout short 
+ lacp port-priority 128 
+ storm-control broadcast enable 
+ storm-control broadcast level kbps 10000 
+ storm-control include-multicast unknown-unicast 
+ service-policy input "p%QOS3%" default-action permit-any 
+ switchport general allowed vlan add 2 untagged 
+ power inline priority critical 
+ auto-voip enable 
+!
+interface gigabitethernet4
+ lacp timeout short 
+ lacp port-priority 128 
+ storm-control broadcast enable 
+ storm-control broadcast level kbps 10000 
+ storm-control include-multicast unknown-unicast 
+ service-policy input "p%QOS4%" default-action permit-any 
+ power inline priority critical 
+ auto-voip enable 
+!
+interface gigabitethernet5
+ lacp timeout short 
+ lacp port-priority 128 
+ storm-control broadcast enable 
+ storm-control broadcast level kbps 10000 
+ storm-control include-multicast unknown-unicast 
+ service-policy input "p%QOS5%" default-action permit-any 
+ switchport general allowed vlan add 3 untagged 
+ power inline priority critical 
+ auto-voip enable 
+!
+interface gigabitethernet6
+ lacp timeout short 
+ lacp port-priority 128 
+ storm-control broadcast enable 
+ storm-control broadcast level kbps 10000 
+ storm-control include-multicast unknown-unicast 
+ service-policy input "p%QOS6%" default-action permit-any 
+ power inline priority critical 
+ auto-voip enable 
+!
+interface gigabitethernet7
+ lacp timeout short 
+ lacp port-priority 128 
+ storm-control broadcast enable 
+ storm-control broadcast level kbps 10000 
+ storm-control include-multicast unknown-unicast 
+ service-policy input "p%QOS7%" default-action permit-any 
+ power inline priority critical 
+ auto-voip enable 
+!
+interface gigabitethernet8
+ lacp timeout short 
+ lacp port-priority 128 
+ storm-control broadcast enable 
+ storm-control broadcast level kbps 10000 
+ storm-control include-multicast unknown-unicast 
+ service-policy input "p%QOS8%" default-action permit-any 
+ power inline priority critical 
+ auto-voip enable 
+!
+interface gigabitethernet9
+ lacp timeout short 
+ lacp port-priority 128 
+ storm-control broadcast enable 
+ storm-control broadcast level kbps 10000 
+ storm-control include-multicast unknown-unicast 
+ service-policy input "p%QOS9%" default-action permit-any 
+ auto-voip enable 
+!
+interface gigabitethernet10
+ lacp timeout short 
+ lacp port-priority 128 
+ storm-control broadcast enable 
+ storm-control broadcast level kbps 10000 
+ storm-control include-multicast unknown-unicast 
+ service-policy input "p%QOS10%" default-action permit-any 
+ auto-voip enable 
+!
+interface gigabitethernet11
+ lacp timeout short 
+ lacp port-priority 128 
+ storm-control broadcast enable 
+ storm-control broadcast level kbps 10000 
+ storm-control include-multicast unknown-unicast 
+ service-policy input "p%QOS11%" default-action permit-any 
+ auto-voip enable 
+!
+interface gigabitethernet12
+ lacp timeout short 
+ lacp port-priority 128 
+ storm-control broadcast enable 
+ storm-control broadcast level kbps 10000 
+ storm-control include-multicast unknown-unicast 
+ service-policy input "p%QOS12%" default-action permit-any 
+ auto-voip enable 
+!
+interface gigabitethernet13
+ lacp timeout short 
+ lacp port-priority 128 
+ storm-control broadcast enable 
+ storm-control broadcast level kbps 10000 
+ storm-control include-multicast unknown-unicast 
+ service-policy input "p%QOS13%" default-action permit-any 
+ auto-voip enable 
+!
+interface gigabitethernet14
+ lacp timeout short 
+ lacp port-priority 128 
+ storm-control broadcast enable 
+ storm-control broadcast level kbps 10000 
+ storm-control include-multicast unknown-unicast 
+ service-policy input "p%QOS14%" default-action permit-any 
+ auto-voip enable 
+!
+interface gigabitethernet15
+ lacp timeout short 
+ lacp port-priority 128 
+ storm-control broadcast enable 
+ storm-control broadcast level kbps 10000 
+ storm-control include-multicast unknown-unicast 
+ service-policy input "p%QOS15%" default-action permit-any 
+ auto-voip enable 
+!
+interface gigabitethernet16
+ lacp timeout short 
+ lacp port-priority 128 
+ storm-control broadcast enable 
+ storm-control broadcast level kbps 10000 
+ storm-control include-multicast unknown-unicast 
+ service-policy input "p%QOS16%" default-action permit-any 
+ auto-voip enable 
+!
+exit
+ip default-gateway %GATEWAY%
+encrypted crypto key import rsa
+---- BEGIN SSH2 ENCRYPTED PRIVATE KEY ----
+Comment: RSA Private Key
+G+Os78f1aaw9ntvsy4nlzyV7Wnc+BULkXI5KlqzQ+HaQ0x63XszpxrEVbQXqDvN97QZLrO
+peYQu4UTUJWmzdR39rcXJgflapstYpkfzZVQW4p+1YqVMcoEb7Qa2E03aziVpXsGFbeGCI
+KtV1uPo9TBPMiPt9L2kCCnptOPy8TAgLE7Qc8NvpIL7upYI36GeL9r8j27zsNzG2Yepyb7
+qk4Zl/maf1GnM2UNj1asMZ3OMeDSZRgph898DVl8pohOm/n3DANT16vut/jv2RICDYgrkg
+cV1t3xQ1G2/25yJtgpSdgi04rtJpUlZuxC26AdV12HP/r62nPz9GElNY7vvDdSswx01rnk
+FURjnWKYaYOM6idd01Z3EwWb+EGE0yAKJErO7lwQBqkS+E6cb7eVwA3HmHog6B5nH+BoPq
++syzxNpAvi0n12nhN9qGrAi/SXYrT7Eqz4iOF/Ed3WIWLqxwx4YDEAnp3kY2YDQOkfcdew
+L0uM2l9N82Vb5OmwJaMcON28J3KR18lR4Ak21o6UPzc4xRed3fxjeGyaLXQE7QMzXNtVsB
+F16knNxKtXPw4qeo5yiHxfRSm31N4UmI5PFqs3Ij4cGf/7BTnD4iLrezYsp+jQp05jdh2Q
+xrBgOhVcf66fQtzT/b2oSpOOyNLWjGPrFDjx7Xp7UF6FSne/bBEY5HlUN06EyVufXvoudK
+QQpyBt1C3x2KVjOtpZzvHJCGoGlEuuiKrPpfKwEI3GnLMGQemilwypvHKFje0lvTlJu3u3
+U4J1kPMIrMxS44unFs27MPX0ho7kWhj7cE+5a1SKFTmgBAD6Ra8vKBDDF68eNV0hFgwMRr
+5kvIElRR7sJcsDSEC5XbGsnmghZDEXXvJUMWadCVVMSsxNtb4l+jmtNUOI9EdMJF6poboe
+WJ4GZ/JJDNe2Z9M2YrEHGLaSPOoF5dY0E7woTwra2ZCMk+PGYRn4qDWtlTxyTTxvOQpf1v
+yPpdTZ1eCRR4cJvgcD+7xFQWqXO3ybHVnBd9cgrFKVcakK96DHHEUuxmnn/0Swi1ZCbKBh
+Yw/WrAa1ynmzklx8+OUhK2PfZEQo2zirDUKRoKt4GYVB41IzD02vSbDLaDAg==
+---- END SSH2 PRIVATE KEY ----
+
+---- BEGIN SSH2 PUBLIC KEY ----
+Comment: RSA Public Key
+AAAAB3NzaC1yc2EAAAADAQABAAAAgQCzJvMKkRCZcC4A+kh77gIq46KhDH4hPQtJITLo8y
+ZCnhg4kubc5APOplhcIdZH7uUZ1l3crOvM7HolFUHxu/qZw3OykG6kUu+rfw5hHt8ehy2b
+duzgHGQSeAIj+UWI8rr1IL8y1VxE2eUEAzkT9vuP+9pbPiAz5lNTCRwmblDk1Q==
+---- END SSH2 PUBLIC KEY ----
+.
+encrypted crypto key import dsa
+---- BEGIN SSH2 ENCRYPTED PRIVATE KEY ----
+Comment: DSA Private Key
+CTJwiEFB5AZTtq7oR9GXb90QKfqwIgJxQZM0LkmhbAYcX0QvFG9aUII5hm1zSqoE6jKy/O
+sVcak7ad/+kfUWlQM0UI6RdgRPWOm1e+b21f6qO1MkZsIousqa0WV7roqR0lkqKGnjkQHl
+Jyp6DvNOF25PPmJAqXQxPOvCldKVQOY2ZHFi0fc4/L0Iqqnoj5+1RXvNLo20W24RmTVpTE
+e48PjytA271BEOzvY7/OIae2ql54ASVWefpR7nGBRlHJYvCNFSPVntKKgAUP643D2ZZqhC
+sMNtQgp+boR8N4s9Dk00TP8E6l/3VmagrEqdlD6o8hiV3KKSJsHoHyRZrtwqR7btfINkP4
+6UYWHMtuGHlkMUKIpfn29GomIKs7WnOPaZ/rGrnmgXv5DoD9hKPYe5nq/4vVqJJtknIPDU
+wVyt/azIY3FgQ0bipItRN6uOp82kDEJ5ZOfJVfrjIgL8Iqf9NpwKb3momXcjy18eaLjedw
+9e8YyoFOMcclRMV2LLy+4IsuHYCI9LGcwgNrygpoMAWjNNFs5W94aU7cNA5FJwz7z/N8l1
+3SooeuPEDLuJcbMdg+/vUMFWQb3W3Bh7ogcLiehHdnOxj7Xkq7eEOhtDOUQBGdaRtUHLDn
+GfLhayQ7CMmZ8nS7UkmP7WQAcJ1bpXcnkbMHzqQRMyIZEllt31i7Mely1bLfTIRtsJROJQ
+EwcLQf3ICeY1cUedO2NBCehzDx7+KdAdnIRJQxSnv6LvIq07X1vAqaiMTHlGHb4C/rwki5
+qqwhLahXvk2N8fGz4OFo7IZ57+zy3wwQgOCsOTQ1axQA9QJkBvL8Q3GcKHSIGv
+---- END SSH2 PRIVATE KEY ----
+
+---- BEGIN SSH2 PUBLIC KEY ----
+Comment: DSA Public Key
+AAAAB3NzaC1kc3MAAACBAOwk6OQIEWnHz2OIRJlkII25h5pUtCkoixED9HosVcYl2PXvZI
+UI70E5b4+BYnR1p7B3q8I3k0kWlLZRA/4wM/lS45OZn/TbsQFoEULD0ANjVoN4CQCxyTJ8
+W70bOUDRqbgmTXlzNDwMBQd8s1xa3Vb5SdfarzILY5DjE2oAnt0HAAAAFQCx9AixDsNRdl
+7uGJRyR4M1UayWXQAAAIEArrbNhJtiNb8GCI8GiWtq/Fw0DjjThO56b5+6BBTjYV9nKvh3
+lT4wF/Gl3iYAQhezo/liUgU3MBp1/KxQtNyYrGozldN/zl16VJROnW65coaXFrdVOALIKQ
+LlT4SXQtWmXJgQGgqC+8r4aMe/ZLYtNrckQyOhskqe8PrWgXMH6YMAAACBALw97hXvqTJj
+fO0GH1noS+gyPchBObq/YKBoC97B5A5/fB9L9iSMZavNG5lGqbt9OoF6JZo0BXe2DTgUc0
+iD+lgzLB2OQMooBuin3Oo3JbzfgCqBPQC3pRvxVQtNTlvlOoT2+ClBWh52g+VUYzLo1UIi
+l/Mf2DnlL0Cm7a1lqBvz
+---- END SSH2 PUBLIC KEY ----
+.
+encrypted crypto certificate 1 import
+-----BEGIN RSA ENCRYPTED PRIVATE KEY-----
+WAD3rGgHyQE7cloYBuy9bKw3woSWCE/RAWjBBUEfaiN351NbHzytix7m52GELDuZHlWuOM
+P3fqWgF3jPiAUTrvzsn8n/tBZw9GCKlr0opjXvEXNFp5R5wtraoL8X+uZs2BBLDktkHFI1
+BFUFYGsl3HenVjUvSV2p5KWZpDZG7347f2LaAS2Czi1kq0ajACcgXrGflomFkoMTCgOMT6
+f5YWn82KCU7v//CQcCxhQVP3PeL2hBc/lLm3j2La9oopeTbOmdTKhDdzx380EvyWhVejfX
+ToXiyoTnL/VlOTarQTsoAuD6UohggZ5l8R5ctkIDfvzdTJlMDoVK/wbRWft3mit9ir70jh
+1KFbIA4RM2tf0tizH34WBslSmh1+Jz6x/FM5XdTpKiLBJ1IICNGnuZdPTnnokewm/Njgcv
+rZF3wiLeOTologsgNd3u82M4twFNFq3GETxQVj2T2MS+ove/xAmfC5JJ8rv844ycedh6C2
+lnlPAMGEhgPpOX3cZOThBhLC00pFCjy/wme1W/Cdp4C0id0HjLJqps2MKTLjlxt7P8RTDz
+FGExPyPuuPn+yamLfaSd/95zULWP0tSYUWy8sQW3gGTQZsfzGLmf7fesOmX088ORwppu1T
+21almu1RreZNlN2hvP6tcibg4nE7Fd0Uq8OnVGBm9ZTZnoV9dj4MGuoEs3CYJVVtmSHlsG
+yXVPo+Mj1zw4ayrWmBlOvjlkyPH9ovFJhCiDaQc1TbHs3fuUzQPYTi6zOIap2NA9sGQdug
+1A4ZeCX0RADeLqgqXAPRnll9OTEVKx4Ag7YsQQWFvHDTXdv6BWc3DlP8pxr9aE7p3CAG4G
++EN19/iv9l3hVnA8mb11djBQ0hwYhMuw1kY4TIsdhu0gxObMuPmp109kD8mks3Swhtpi9B
+6aC94tOmjifvh+mDIJfUZ33Zl8fnkzEg2qGaqWL+JTLdjsUQuD2v+nIBKQHBP6eBDph/CX
+as7B/moWwsfEiZlp7eG9TFhxviP1++VTdYw1v8O28X6Fu9kalA3ooUkfoKCf0Nm3iZSB2+
+IvWStLMCmJX30BkjVMtaLUShh+2IH3xjRFLUj0RXPl+fxH+NcQRXqvzW/nBJtjX9/pTnyI
+Eht/bMQc+LA=
+-----END RSA PRIVATE KEY-----
+
+-----BEGIN RSA PUBLIC KEY-----
+MIGJAoGBAKu8VM7MX/TIA92NUuO1O7A7vovmrvL7wqZBc94xLOh19HcOlkScsJTHkaGgsH
+wjI1QqAlHoWJwpYYY9WSJAjGbFpWEodxn9hhSLtmMKryiM/m3fTlIkjk6dmO/sU06Cp3Jv
++8uyr9OxhFzSzUkK1XTJdtyCf6yb5xfe/31DPDe3AgMBAAE=
+-----END RSA PUBLIC KEY-----
+-----BEGIN CERTIFICATE-----
+MIICHDCCAYUCEETsCAn1djm1aVCq+9BBGZAwDQYJKoZIhvcNAQEEBQAwTzELMAkG
+A1UEBhMCICAxCjAIBgNVBAgTASAxCjAIBgNVBAcTASAxEDAOBgNVBAMTBzAuMC4w
+LjAxCjAIBgNVBAoTASAxCjAIBgNVBAsTASAwHhcNMTQwNTIwMTQyMjEyWhcNMTUw
+NTIwMTQyMjEyWjBPMQswCQYDVQQGEwIgIDEKMAgGA1UECBMBIDEKMAgGA1UEBxMB
+IDEQMA4GA1UEAxMHMC4wLjAuMDEKMAgGA1UEChMBIDEKMAgGA1UECxMBIDCBnzAN
+BgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAq7xUzsxf9MgD3Y1S47U7sDu+i+au8vvC
+pkFz3jEs6HX0dw6WRJywlMeRoaCwfCMjVCoCUehYnClhhj1ZIkCMZsWlYSh3Gf2G
+FIu2YwqvKIz+bd9OUiSOTp2Y7+xTToKncm/7y7Kv07GEXNLNSQrVdMl23IJ/rJvn
+F97/fUM8N7cCAwEAATANBgkqhkiG9w0BAQQFAAOBgQA8bYgod3RumjqEEoFmoM8x
+rLrFV5HwTHR91qZYdgMWoIb/0fjBKHmsCcFWxUAmRr/wA0FTd6xAjuAjjTZlB87r
+PQAIHGUBA+LBf4t4c2RjE5O+mQ2zrFimBEA2Z2PQ+kmAIENONOrKpeoNDXUb5aqP
+L/RVCVl8VKc2fovns3gGtQ==
+-----END CERTIFICATE-----
+.
+encrypted crypto certificate 2 import
+-----BEGIN RSA ENCRYPTED PRIVATE KEY-----
+OrkcXktmXmOI9TEHnjviLrf9IlNQe7ugeY2PO1opcLC8QvObLwORJc74OaZUEEfBgHvMa1
+bchdAinCRp+NkKeXpfyISBlZtugT5KlrYAcJW/ryXZ9oP9D9esQC+Xbjr6oXKl71XdNIJH
+w5pBm7M22SSL2kgho0lrGzwlVtZsBSsGF2Dbj+lOpuQBQ5BHzYkOyn4UaxpKK1DlF8GadU
+AOh64mSXNKku5gNgFpnYgLYiko/vqkx0TV4BlZxspuKNzzewEp0PVG6pnx+lHtRbV5qfWp
+XhjKpFzUCWIthPU24CAL1y+o+WA6EJCfUBpFhEmuuhGVCzkTwoteTXUo7XuDDkNFVoBcbl
+Zf43oM7hrashO4OvltmqCNUKSfX9qMu9n00E/C5zTJm6GK4cbcmYA3cTj9n/+7kR0am1dU
+08Oqyr1eEuR5+m3qU+VrElORtesYfBf+3mtx6OejCaLvF6POPrP2E0jKf5lVj067IN/OS7
+kmr/XisK2++v79ZUBWALXJvaRTLvbmQM+/F/PJl0XQLOPKkSShwOYkhLQHjtgEQZRUZPWx
+A9NJcUG8k/XrM00z7O2dOgUgXlbRFe+E4qGkB1JyzhIYDA7pCrVpxChBsx+VLjicYlbw+t
+UgWDD4q1grue0m/T9H6zdeAe+4LfXXZnhFMy3lbJ7p3OYCP4ns3whuptOjL0XBO9xeRIqU
+BF8GZzJC78Waso5ZYWz1TZklGUCp1FBi/WWPFDw04t2Sl3Ae6G5Ps83DZZyJ3Ykd94IB13
+RQ2PfqqY42pTQCG1pW0HXZcQTLhUtjZHtqcEXJrLPtgpIpQZ55d1QDoXLrvUaoBmld4DD7
+pinKIgeTULJ8hunLzK+4RWocGIhKFx4J2TDlhjjQ/jVNAjpqtbj/kkJ4fpXG4qmdTN38nM
+tgAV1RTwoUSJbJOJ1oSQMXDlfSFLVs24hB2GvaH0ss5ZQlk7mH6a/Al93TCE0OP5vz2KGD
+Poi3u18PyZSRqQMmDfJLpVnHOibMhHnq+7cJ7xYhh97r8A6QtNk4eZfuB3aodtED687KdQ
+HKpC/PM6ZV1eB3MxwlJMWlCnoE/ZcXwb6prWqeU4SEPHcrWzs4ZABxGxKKlw==
+-----END RSA PRIVATE KEY-----
+
+-----BEGIN RSA PUBLIC KEY-----
+MIGJAoGBALdsUDT444dHbP1weRXJd9fT7LF1OZf3FwefEMKOk5GK3Xzctkq9wZeC25/ROZ
+HP4lHgUzPsqb324iiJx5Eef/WpgKvDCd4EMuRfSACIPFL+TGt68xYBgmstcYi+z2csVroI
+mDQYloXVSBnSexsuoVWtku2Dy5WCCh6SV5mIOGCDAgMBAAE=
+-----END RSA PUBLIC KEY-----
+-----BEGIN CERTIFICATE-----
+MIICHDCCAYUCEHxVptwYX2+q6+5ganL4yzwwDQYJKoZIhvcNAQEEBQAwTzELMAkG
+A1UEBhMCICAxCjAIBgNVBAgTASAxCjAIBgNVBAcTASAxEDAOBgNVBAMTBzAuMC4w
+LjAxCjAIBgNVBAoTASAxCjAIBgNVBAsTASAwHhcNMTQwNTIwMTQyMjE4WhcNMTUw
+NTIwMTQyMjE4WjBPMQswCQYDVQQGEwIgIDEKMAgGA1UECBMBIDEKMAgGA1UEBxMB
+IDEQMA4GA1UEAxMHMC4wLjAuMDEKMAgGA1UEChMBIDEKMAgGA1UECxMBIDCBnzAN
+BgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAt2xQNPjjh0ds/XB5Fcl319PssXU5l/cX
+B58Qwo6TkYrdfNy2Sr3Bl4Lbn9E5kc/iUeBTM+ypvfbiKInHkR5/9amAq8MJ3gQy
+5F9IAIg8Uv5Ma3rzFgGCay1xiL7PZyxWugiYNBiWhdVIGdJ7Gy6hVa2S7YPLlYIK
+HpJXmYg4YIMCAwEAATANBgkqhkiG9w0BAQQFAAOBgQC2nHmLe1AUIyQfQ43QI/P7
+z61/rOraq8K7RCLaLxG+/EJXZacyk+9erLcXG+s96PsLCOBOFkDzMzhiSklZMWKT
+qp7IMBnIOPSfzoccSK1HVrV6VsITxEFQbsRrNRNArQB33BJvms1g/SFfcmoOiWwZ
+AhfhFUw4PKAfr9/Fh3mHwg==
+-----END CERTIFICATE-----
+.
